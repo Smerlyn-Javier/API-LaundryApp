@@ -1,17 +1,27 @@
-//importing express
 const express = require("express");
 const app = express();
+const mongoose = require("mongoose");
 
 //importing routes
+const { UserRoutes } = require("./routes");
 
 //importing setting
-const { PORT } = require("./config");
+const { PORT, MONGO_URI } = require("./config");
 
 //middleware
+app.use(express.json());
 
 //routes
+app.use("/api/user", UserRoutes);
 
 //starting the server
-app.listen(PORT, () => {
-  return console.log(`Application running on port ${PORT}`);
-});
+mongoose
+  .connect(MONGO_URI, { useNewUrlParser: true })
+  .then(() => {
+    app.listen(PORT, () => {
+      return console.log(`Application running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.log(err);
+  });
