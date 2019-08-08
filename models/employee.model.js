@@ -2,25 +2,26 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const { compareSync, hashSync, genSaltSync } = require("bcryptjs");
 
-const UserSchema = new Schema(
+const EmployeeSchema = new Schema(
   {
-    userName: { type: String, require: true },
-    email: { type: String },
-    password: { type: String, require: true },
+    idPosition: { type: Schema.Types.ObjectId, ref: "Position" },
+    idStatus: { type: Schema.Types.ObjectId, ref: "Status" },
     name: { type: String, require: true, lowercase: true },
-    lastName: { type: String, required: false, lowercase: true },
-    creationDate: { type: Date, default: Date.now() }
+    lastName: { type: String, lowercase: true },
+    phone: { type: String },
+    userName: { type: String, require: true },
+    password: { type: String, require: true }
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
-UserSchema.methods.toJSON = function() {
+EmployeeSchema.methods.toJSON = function() {
   let user = this.toObject();
   delete user.password;
   return user;
 };
 
-UserSchema.pre("save", async function(next) {
+EmployeeSchema.pre("save", async function(next) {
   const user = this;
 
   if (!user.isModified("password")) {
@@ -34,8 +35,8 @@ UserSchema.pre("save", async function(next) {
   next();
 });
 
-UserSchema.methods.comparePasswords = function(password) {
+EmployeeSchema.methods.comparePasswords = function(password) {
   return compareSync(password, this.password);
 };
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("Employee", EmployeeSchema);
